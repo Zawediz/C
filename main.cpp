@@ -5,23 +5,23 @@
 
 using namespace std;
 
+struct Node
+{
+    Node():depth(0),visited(false){}
+    int depth;
+    int previous;
+    bool visited;
+};
+
 class Graph
 {
 public:
     Graph(unsigned int Number):ConstVerticesNumber(Number),OutVector(Number){}
     void GetNextVertices(int vertex, vector<int> & NextVertices) const;
-    int MinCycle();
     int VerticesNumber() const;
     void AddRib(int from, int to);
 private:
-    struct Node
-    {
-        Node():depth(0),visited(false){}
-        int depth;
-        int previous;
-        bool visited;
-    };
-    int Cycle(int vertex);
+
     unsigned int ConstVerticesNumber;
     vector<unordered_set<int>> OutVector;
 };
@@ -42,9 +42,9 @@ void Graph :: GetNextVertices(int vertex, vector<int> & NextVertices) const
     for (int i : OutVector[vertex]) NextVertices.push_back(i);
 }
 
-int Graph :: Cycle(int vertex)
+int Cycle(int vertex, Graph& graph)
 {
-    vector<Node> Vertices(VerticesNumber());
+    vector<Node> Vertices(graph.VerticesNumber());
     queue<int> Queue;
     Queue.push(vertex);
     Vertices[vertex].visited = true;
@@ -53,7 +53,7 @@ int Graph :: Cycle(int vertex)
     {
         vector<int> NextVertices;
         int CurrentVertex = Queue.front();
-        GetNextVertices(CurrentVertex, NextVertices);
+        graph.GetNextVertices(CurrentVertex, NextVertices);
         Queue.pop();
 
         for(int i : NextVertices)
@@ -72,18 +72,26 @@ int Graph :: Cycle(int vertex)
             }
         }
     }
-    return VerticesNumber() + 1;
+    return -1;
 }
 
-int Graph :: MinCycle()
+int MinCycle(Graph& graph)
 {
-    int minCycle = VerticesNumber() + 1;
-    for(int i = 0; i < VerticesNumber(); ++i)
+    bool f = false;
+    int minCycle = graph.VerticesNumber() + 1;
+    for(int i = 0; i < graph.VerticesNumber(); ++i)
     {
-        int cycle = Cycle(i);
-        if (cycle < minCycle) minCycle = cycle;
+        int cycle = Cycle(i, graph);
+        if (cycle < minCycle)
+        {
+            minCycle = cycle;
+            f = true;
+        }
     }
-    return minCycle;
+    if (f)
+        return minCycle;
+    else
+        return -1;
 }
 
 int main()
@@ -102,8 +110,7 @@ int main()
         graph.AddRib(f, s);
     }
 
-    int min = graph.MinCycle();
-    if (min == graph.VerticesNumber() + 1) min = -1;
+    int min = MinCycle(graph);
     cout << min;
     return 0;
 }
