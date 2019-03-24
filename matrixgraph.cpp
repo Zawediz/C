@@ -11,7 +11,7 @@ int MatrixGraph::VerticesCount() const
     return AmountOfVertices;
 }
 
-void MatrixGraph::GetNextVertices(int vertex, vector<int>& vertices) const
+void MatrixGraph::GetNextVertices(int vertex, std::vector<int>& vertices) const
 {
     vertices.clear();
     for (int i = 0; i < VerticesCount(); ++i)
@@ -22,7 +22,7 @@ void MatrixGraph::GetNextVertices(int vertex, vector<int>& vertices) const
         }
     }
 }
-void MatrixGraph::GetPrevVertices(int vertex, vector<int>& vertices) const
+void MatrixGraph::GetPrevVertices(int vertex, std::vector<int>& vertices) const
 {
     vertices.clear();
     for (int i = 0; i < VerticesCount(); ++i)

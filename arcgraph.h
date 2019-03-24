@@ -19,7 +19,7 @@ public:
     {
         for(int i = 0; i < AmountOfVertices; ++i)
         {
-            vector<int> vertices;
+            std::vector<int> vertices;
             graph->GetNextVertices(i, vertices);
             for (int j = 0; j < vertices.size(); ++j)
             {
@@ -32,12 +32,12 @@ public:
 
     virtual int VerticesCount() const;
 
-    virtual void GetNextVertices(int vertex, vector<int>& vertices) const;
-    virtual void GetPrevVertices(int vertex, vector<int>& vertices) const;
+    virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const;
+    virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const;
 
 private:
 
     int AmountOfVertices;
-    vector<Rib> Ribs;
+    std::vector<Rib> Ribs;
 
 };

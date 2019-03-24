@@ -10,7 +10,7 @@ int ArcGraph :: VerticesCount() const
     return AmountOfVertices;
 }
 
-void ArcGraph :: GetNextVertices(int vertex, vector<int>& vertices) const
+void ArcGraph :: GetNextVertices(int vertex, std::vector<int>& vertices) const
 {
     vertices.clear();
     for (auto Rib : Ribs)
@@ -22,7 +22,7 @@ void ArcGraph :: GetNextVertices(int vertex, vector<int>& vertices) const
     }
 }
 
-void ArcGraph :: GetPrevVertices(int vertex, vector<int>& vertices) const
+void ArcGraph :: GetPrevVertices(int vertex, std::vector<int>& vertices) const
 {
     vertices.clear();
     for (auto Rib : Ribs)
