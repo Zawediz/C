@@ -41,7 +41,7 @@ struct Field
 
     int getNumber(int pos) const;
 
-    bool solve() const;
+    bool hasSolution() const;
 
     Field Right() const;
 
@@ -57,7 +57,7 @@ struct Field
     char Move;
 };
 
-bool Field::solve() const
+bool Field::hasSolution() const
 {
     int Inversions = 0;
 
@@ -153,10 +153,10 @@ Field Field::Down() const
 
 }
 
-class Answer
+class CGameSolver
 {
 public:
-    bool BFS(const Field &start, list<char> &path);
+    bool getPath(const Field &start, list<char> &path);
 
 private:
     void visited(const Field &field);
@@ -165,11 +165,11 @@ private:
     map<int, Field> fields;
 };
 
-bool Answer::BFS(const Field &start, list<char> &path)
+bool CGameSolver::getPath(const Field &start, list<char> &path)
 {
     path.clear();
 
-    if (!start.solve())
+    if (!start.hasSolution())
     {
         return false;
     }
@@ -218,7 +218,7 @@ bool Answer::BFS(const Field &start, list<char> &path)
     return true;
 }
 
-void Answer::visited(const Field &field)
+void CGameSolver::visited(const Field &field)
 {
     if (fields.find(field.fieldPosition) == fields.end())
     {
@@ -239,9 +239,9 @@ int main()
     }
 
     Field field(values);
-    Answer answer;
+    CGameSolver answer;
     list<char> path;
-    if (!answer.BFS(field, path))
+    if (!answer.getPath(field, path))
     {
         cout << -1;
     }
