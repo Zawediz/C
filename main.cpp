@@ -68,37 +68,33 @@ double MatrixGraph::GetWeight(int i, int j) const
     return matrix[i][j];
 }
 
-bool Arbitrage(const MatrixGraph &graph)
+bool hasProfit(const MatrixGraph &graph)
 {
-    for (int r = 0; r < graph.VerticesCount(); ++r)
-    {
-        std::vector<double> weights(graph.VerticesCount(), -1);
-        std::vector<int> vertices(graph.VerticesCount());
+    std::vector<double> weights(graph.VerticesCount(), -1);
+    std::vector<int> vertices(graph.VerticesCount());
+    for (int r = 0; r < graph.VerticesCount(); ++r) {
         weights[r] = 1;
-        for (int t = 0; t < graph.VerticesCount() - 1; ++t)
-        {
-            for (int j = 0; j < graph.VerticesCount(); ++j)
-            {
+        for (int t = 0; t < graph.VerticesCount() - 1; ++t) {
+            for (int j = 0; j < graph.VerticesCount(); ++j) {
                 graph.GetPrevVertices(j, vertices);
                 for (int i : vertices)
-                    if (weights[i] != -1)
-                    {
+                    if (weights[i] != -1) {
                         if (weights[j] < weights[i] * graph.GetWeight(i, j))
                             weights[j] = weights[i] * graph.GetWeight(i, j);
                     }
             }
         }
+    }
 
-        for (int j = 0; j < graph.VerticesCount(); ++j)
-        {
-            graph.GetPrevVertices(j, vertices);
-            for (int i : vertices)
-                if (weights[i] != -1)
-                {
-                    if (weights[j] < weights[i] * graph.GetWeight(i, j))
-                        return true;
-                }
-        }
+    for (int j = 0; j < graph.VerticesCount(); ++j)
+    {
+        graph.GetPrevVertices(j, vertices);
+        for (int i : vertices)
+            if (weights[i] != -1)
+            {
+                if (weights[j] < weights[i] * graph.GetWeight(i, j))
+                    return true;
+            }
     }
     return false;
 }
@@ -121,7 +117,7 @@ int main()
         }
     }
 
-    if (Arbitrage(graph))
+    if (hasProfit(graph))
         std::cout << "YES";
     else
         std::cout << "NO";
