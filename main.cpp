@@ -72,17 +72,17 @@ bool hasProfit(const MatrixGraph &graph)
 {
     std::vector<double> weights(graph.VerticesCount(), -1);
     std::vector<int> vertices(graph.VerticesCount());
-    for (int r = 0; r < graph.VerticesCount(); ++r) {
+    for (int r = 0; r < graph.VerticesCount(); ++r)
         weights[r] = 1;
-        for (int t = 0; t < graph.VerticesCount() - 1; ++t) {
-            for (int j = 0; j < graph.VerticesCount(); ++j) {
-                graph.GetPrevVertices(j, vertices);
-                for (int i : vertices)
-                    if (weights[i] != -1) {
-                        if (weights[j] < weights[i] * graph.GetWeight(i, j))
-                            weights[j] = weights[i] * graph.GetWeight(i, j);
-                    }
-            }
+
+    for (int t = 0; t < graph.VerticesCount() - 1; ++t) {
+        for (int j = 0; j < graph.VerticesCount(); ++j) {
+            graph.GetPrevVertices(j, vertices);
+            for (int i : vertices)
+                if (weights[i] != -1) {
+                    if (weights[j] < weights[i] * graph.GetWeight(i, j))
+                        weights[j] = weights[i] * graph.GetWeight(i, j);
+                }
         }
     }
 
