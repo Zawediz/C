@@ -23,11 +23,11 @@ public:
 
     void AddEdge(int from, int to, int weight);
 
-    void GetEdges(int vertex, vector <Edge> &edges) const;
+    void GetEdges(int vertex, vector<Edge> &edges) const;
 
 private:
     unsigned AmountOfVertices;
-    vector <vector<Edge>> lists;
+    vector<vector<Edge>> lists;
 };
 
 int CGraph::VerticesCount() const {
@@ -39,7 +39,7 @@ void CGraph::AddEdge(int from, int to, int weight) {
     lists[to].push_back(Edge(from, weight));
 }
 
-void CGraph::GetEdges(int vertex, vector <Edge> &edges) const {
+void CGraph::GetEdges(int vertex, vector<Edge> &edges) const {
     edges.clear();
 
     for (Edge item: lists[vertex]) {
@@ -52,6 +52,7 @@ int PrimFunction(CGraph &graph) {
 
     std::set<pair<int, int>> Q;
     int size = graph.VerticesCount();
+    vector<int> weights(size, std::numeric_limits<int>::max());
     vector<bool> used(size, false);
     Q.emplace(std::make_pair(0, 0));
 
@@ -67,32 +68,37 @@ int PrimFunction(CGraph &graph) {
             used[v] = true;
             answer += weight;
 
-            vector <Edge> edges;
+            vector<Edge> edges;
             graph.GetEdges(v, edges);
 
             for (Edge edge: edges) {
                 if (!used[edge.vertex]) {
+                    if (edge.weight < weights[edge.vertex]) {
+                        weights[edge.vertex] = edge.weight;
+                        Q.erase(std::make_pair(edge.weight, edge.vertex));
+                    }
                     Q.emplace(make_pair(edge.weight, edge.vertex));
+
                 }
             }
         }
-    }
 
+
+    }
     return answer;
 }
 
+    int main() {
+        int n, m;
 
-int main() {
-    int n, m;
+        cin >> n >> m;
+        CGraph graph(n);
+        for (int i = 0; i < m; ++i) {
+            int from, to, weight;
+            cin >> from >> to >> weight;
+            graph.AddEdge(from - 1, to - 1, weight);
+        }
 
-    cin >> n >> m;
-    CGraph graph(n);
-    for (int i = 0; i < m; ++i) {
-        int from, to, weight;
-        cin >> from >> to >> weight;
-        graph.AddEdge(from - 1, to - 1, weight);
+        cout << PrimFunction(graph);
+        return 0;
     }
-
-    cout << PrimFunction(graph);
-    return 0;
-}
