@@ -1,259 +1,98 @@
 #include <iostream>
-#include <list>
-#include <map>
 #include <vector>
 #include <queue>
-#include <cmath>
-
+#include <set>
 
 using namespace std;
 
-int getDigit(int number, int pos)
-{
-    int currentField = number;
-    for (int i = 0; i < pos; ++i)
-    {
-        currentField /= 10;
-    }
-    return currentField % 10;
-}
+struct Edge {
+    Edge(int vertex, int weight) : vertex(vertex), weight(weight) {}
 
+    int vertex;
+    int weight;
 
-struct Field
-{
-    Field(){}
-    Field(vector<int> &start)
-    {
-        fieldPosition = 0;
-        for (int i = 0; i < 9; ++i)
-        {
-            setNumber(start[i], i);
-            if (start[i] == 0)
-            {
-                Hole = i;
-            }
-        }
-    }
-
-    Field(const Field &field) : fieldPosition(field.fieldPosition), Hole(field.Hole) {}
-
-    void setNumber(int value, int pos);
-
-    int getNumber(int pos) const;
-
-    bool hasSolution() const;
-
-    Field Right() const;
-
-    Field Left() const;
-
-    Field Up() const;
-
-    Field Down() const;
-
-    int fieldPosition;
-    int previous;
-    int Hole;
-    char Move;
 };
 
-bool Field::hasSolution() const
-{
-    int Inversions = 0;
+class CGraph {
 
-    for (int i = 0; i < 9; ++i)
-    {
-        for (int j = i + 1; j < 9; ++j)
-        {
-            if (getNumber(i) != 0 && getNumber(j) != 0)
-            {
-                if (getNumber(i) > getNumber(j))
-                {
-                    ++Inversions;
+public:
+
+    CGraph(int n) : AmountOfVertices(n), lists(n) {}
+
+    int VerticesCount() const;
+
+    void AddEdge(int from, int to, int weight);
+
+    void GetEdges(int vertex, vector <Edge> &edges) const;
+
+private:
+    unsigned AmountOfVertices;
+    vector <vector<Edge>> lists;
+};
+
+int CGraph::VerticesCount() const {
+    return AmountOfVertices;
+}
+
+void CGraph::AddEdge(int from, int to, int weight) {
+    lists[from].push_back(Edge(to, weight));
+    lists[to].push_back(Edge(from, weight));
+}
+
+void CGraph::GetEdges(int vertex, vector <Edge> &edges) const {
+    edges.clear();
+
+    for (Edge item: lists[vertex]) {
+        edges.push_back(item);
+    }
+}
+
+int PrimFunction(CGraph &graph) {
+    int answer = 0;
+
+    std::set<pair<int, int>> Q;
+    int size = graph.VerticesCount();
+    vector<bool> used(size, false);
+    Q.emplace(std::make_pair(0, 0));
+
+    while (!Q.empty()) {
+        pair<int, int> f = *Q.begin();
+        Q.erase(Q.begin());
+
+
+        int weight = f.first;
+        int v = f.second;
+
+        if (!used[v]) {
+            used[v] = true;
+            answer += weight;
+
+            vector <Edge> edges;
+            graph.GetEdges(v, edges);
+
+            for (Edge edge: edges) {
+                if (!used[edge.vertex]) {
+                    Q.emplace(make_pair(edge.weight, edge.vertex));
                 }
             }
         }
     }
 
-    if (Inversions % 2 == 1)
-        return false;
-    else
-        return true;
+    return answer;
 }
 
-int Field::getNumber(int pos) const
-{
-    return getDigit(fieldPosition, pos);
-}
 
-void Field::setNumber(int value, int pos)
-{
-    int k = pow(10, pos);
-    fieldPosition -= getDigit(fieldPosition, pos) * k;
-    fieldPosition += value * k;
-}
+int main() {
+    int n, m;
 
-Field Field::Right() const
-{
-    Field ChangedField(*this);
-    ChangedField.Move = 'R';
-    ChangedField.previous = fieldPosition;
-
-    int Current = getNumber(Hole + 1);
-    ChangedField.setNumber(Current, Hole);
-    ChangedField.setNumber(0, Hole + 1);
-    ChangedField.Hole += 1;
-
-    return ChangedField;
-
-}
-
-Field Field::Left() const
-{
-    Field ChangedField(*this);
-    ChangedField.Move = 'L';
-    ChangedField.previous = fieldPosition;
-
-    int Current = getNumber(Hole - 1);
-    ChangedField.setNumber(Current, Hole);
-    ChangedField.setNumber(0, Hole - 1);
-    ChangedField.Hole -= 1;
-
-    return ChangedField;
-
-}
-
-Field Field::Up() const
-{
-    Field ChangedField(*this);
-    ChangedField.Move = 'U';
-    ChangedField.previous = fieldPosition;
-
-    int Current = getNumber(Hole - 3);
-    ChangedField.setNumber(Current, Hole);
-    ChangedField.setNumber(0, Hole - 3);
-    ChangedField.Hole -= 3;
-
-    return ChangedField;
-
-}
-
-Field Field::Down() const
-{
-    Field ChangedField(*this);
-    ChangedField.Move = 'D';
-    ChangedField.previous = fieldPosition;
-
-    int Current = getNumber(Hole + 3);
-    ChangedField.setNumber(Current, Hole);
-    ChangedField.setNumber(0, Hole + 3);
-    ChangedField.Hole += 3;
-
-    return ChangedField;
-
-}
-
-class CGameSolver
-{
-public:
-    bool getPath(const Field &start, list<char> &path);
-
-private:
-    void visited(const Field &field);
-
-    queue<int> Queue;
-    map<int, Field> fields;
-};
-
-bool CGameSolver::getPath(const Field &start, list<char> &path)
-{
-    path.clear();
-
-    if (!start.hasSolution())
-    {
-        return false;
+    cin >> n >> m;
+    CGraph graph(n);
+    for (int i = 0; i < m; ++i) {
+        int from, to, weight;
+        cin >> from >> to >> weight;
+        graph.AddEdge(from - 1, to - 1, weight);
     }
 
-    fields[start.fieldPosition] = start;
-    Queue.emplace(start.fieldPosition);
-
-    int fieldPosition;
-    while (1)
-    {
-        fieldPosition = Queue.front();
-        Queue.pop();
-
-        if (fieldPosition == 87654321)
-        {
-            break;
-        }
-
-        Field currentField = fields[fieldPosition];
-
-        if (currentField.Hole % 3 != 0)
-        {
-            visited(currentField.Left());
-        }
-        if (currentField.Hole % 3 != 2)
-        {
-            visited(currentField.Right());
-        }
-        if (currentField.Hole >= 3)
-        {
-            visited(currentField.Up());
-        }
-        if (currentField.Hole <= 5)
-        {
-            visited(currentField.Down());
-        }
-
-    }
-
-    while (fieldPosition != start.fieldPosition)
-    {
-        path.push_front(fields[fieldPosition].Move);
-        fieldPosition = fields[fieldPosition].previous;
-    }
-
-    return true;
-}
-
-void CGameSolver::visited(const Field &field)
-{
-    if (fields.find(field.fieldPosition) == fields.end())
-    {
-        fields[field.fieldPosition] = field;
-        Queue.emplace(field.fieldPosition);
-    }
-}
-
-int main()
-{
-    vector<int> values;
-
-    for (int i = 0; i < 9; ++i)
-    {
-        int a;
-        cin >> a;
-        values.push_back(a);
-    }
-
-    Field field(values);
-    CGameSolver answer;
-    list<char> path;
-    if (!answer.getPath(field, path))
-    {
-        cout << -1;
-    }
-
-    else
-    {
-        cout << path.size() << endl;
-        for (char c: path)
-        {
-            cout << c;
-        }
-    }
-
+    cout << PrimFunction(graph);
     return 0;
 }
