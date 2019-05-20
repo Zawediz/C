@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <set>
 
 using namespace std;
 
@@ -48,14 +49,16 @@ void CGraph::GetEdges(int vertex, vector <Edge> &edges) const {
 
 int PrimFunction(CGraph &graph) {
     int answer = 0;
-    priority_queue < pair < int, int >, vector < pair < int, int >>, greater < pair < int, int >> > Q;
+
+    std::set<pair<int, int>> Q;
     int size = graph.VerticesCount();
     vector<bool> used(size, false);
-    Q.push(make_pair(0, 0));
+    Q.emplace(std::make_pair(0, 0));
 
     while (!Q.empty()) {
-        pair<int, int> f = Q.top();
-        Q.pop();
+        pair<int, int> f = *Q.begin();
+        Q.erase(Q.begin());
+
 
         int weight = f.first;
         int v = f.second;
@@ -69,7 +72,7 @@ int PrimFunction(CGraph &graph) {
 
             for (Edge edge: edges) {
                 if (!used[edge.vertex]) {
-                    Q.push(make_pair(edge.weight, edge.vertex));
+                    Q.emplace(make_pair(edge.weight, edge.vertex));
                 }
             }
         }
